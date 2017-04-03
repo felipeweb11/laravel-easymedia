@@ -1,0 +1,30 @@
+{
+  "name": "felipeweb11/laravel-easymedia",
+  "description": "Value object based image upload solution.",
+  "keywords": ["photo", "image", "upload", "laravel", "eloquent", "value object"],
+  "homepage": "https://github.com/felipeweb11/laravel-easymedia",
+  "require": {
+    "php": ">=5.4.0",
+    "laravel/framework": "^5.1",
+    "intervention/image": "^2.3"
+  },
+  "require-dev": {
+    "orchestra/testbench": "3.4.*",
+    "phpunit/phpunit" : "^5.7.0"
+  },
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Webeleven\\EasyMedia\\": "src/"
+    },
+    "classmap": [
+      "tests"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Felipe",
+      "email": "felipe.ralc@gmail.com"
+    }
+  ]
+}
