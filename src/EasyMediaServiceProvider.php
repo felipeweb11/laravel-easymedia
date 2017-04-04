@@ -3,6 +3,7 @@
 namespace Webeleven\EasyMedia;
 
 use Illuminate\Support\ServiceProvider;
+use Intervention\Image\ImageManager;
 use Webeleven\EasyMedia\Upload\TempFileUploader;
 
 class EasyMediaServiceProvider extends ServiceProvider
@@ -24,12 +25,19 @@ class EasyMediaServiceProvider extends ServiceProvider
             return new MediaService(
                 $storage,
                 new TempFileUploader(),
-                $this->app['Intervention\Image\ImageManager'],
+                $this->getInterventionManager(),
                 new ImageTransformer
             );
         });
 
         $this->mergeConfigFrom(__DIR__.'/../config/easymedia.php', 'easymedia');
+    }
+
+    protected function getInterventionManager()
+    {
+        return new ImageManager([
+            'driver' => $this->app['config']->get('easymedia.image_driver')
+        ]);
     }
 
     protected function getStorageDriver()
