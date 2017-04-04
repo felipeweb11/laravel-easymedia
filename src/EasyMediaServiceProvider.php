@@ -24,7 +24,7 @@ class EasyMediaServiceProvider extends ServiceProvider
             return new MediaService(
                 $storage,
                 new TempFileUploader(),
-                $this->app['image'],
+                $this->app['Intervention\Image\ImageManager'],
                 new ImageTransformer
             );
         });

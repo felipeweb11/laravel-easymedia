@@ -2,19 +2,16 @@
 
 namespace Webeleven\EasyMedia;
 
-use Webeleven\EasyMedia\Common\CastsValueObjects;
+use Exception;
+use InvalidArgumentException;
 use Webeleven\EasyMedia\Mapping\MediaMapper;
+use Webeleven\EloquentValueObject\CastsValueObjects;
 
 trait EasyMediaTrait
 {
     use CastsValueObjects;
 
     protected $mapper;
-
-    protected function getValueObjects()
-    {
-        return $this->mapMediaFields();
-    }
 
     public function getMediaMapper()
     {
@@ -23,6 +20,46 @@ trait EasyMediaTrait
         }
 
         return $this->mapper = new MediaMapper($this);
+    }
+
+    protected function mapMediaFields()
+    {
+        if (! property_exists($this, 'media') || ! is_array($this->media)) {
+            return [];
+        }
+
+        return collect($this->media)->mapWithKeys(function($field) {
+
+            try {
+                list($name, $type) = explode(':', $field);
+            } catch (Exception $e) {
+                list($name, $type) = ['', ''];
+            }
+
+            $class = $this->determineMediaClass($type);
+
+            $this->getMediaMapper()->{$type}($name);
+
+            return [$name => $class];
+
+        })->toArray();
+    }
+
+    protected function determineMediaClass($type)
+    {
+        switch ($type) {
+            case 'image': return Image::class;
+            case 'file': return File::class;
+        }
+
+        throw new InvalidArgumentException(sprintf('Invalid media field type: %s', $type));
+    }
+
+    protected function getValueObjects()
+    {
+        $objects = isset($this->objects) && is_array($this->objects) ? $this->objects : [];
+
+        return array_merge($objects, $this->mapMediaFields());
     }
 
     protected function createValueObject($key, $value)
@@ -45,37 +82,6 @@ trait EasyMediaTrait
         return $service->makeMedia($value, $mapping);
     }
 
-    protected function mapMediaFields()
-    {
-        if (! property_exists($this, 'media') || ! is_array($this->media)) {
-            return [];
-        }
-
-        return collect($this->media)->mapWithKeys(function($field) {
-
-            try {
-                list($name, $type) = explode(':', $field);
-            } catch (Exception $e) {
-                list($name, $type) = ['', ''];
-            }
-
-            $this->getMediaMapper()->{$type}($name);
-
-            return [$name => $this->determineMediaClass($type)];
-
-        })->toArray();
-    }
-
-    protected function determineMediaClass($type)
-    {
-        switch ($type) {
-            case 'image': return Image::class;
-            case 'file': return File::class;
-        }
-
-        throw new InvalidArgumentException('Invalid media field type.');
-    }
-
-    public function mapMedia(MediaMapper $mapper) { }
+    protected function mapMedia(MediaMapper $mapper) { }
 
 }

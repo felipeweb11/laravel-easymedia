@@ -2,7 +2,7 @@
 
 namespace Webeleven\EasyMedia;
 
-use Webeleven\EasyMedia\Common\ValueObject;
+use Webeleven\EloquentValueObject\ValueObject;
 
 class File implements ValueObject
 {
